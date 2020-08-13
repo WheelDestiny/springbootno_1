@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wheeldestiny.springbootno_1.dao.JobOffersListDao">
+    <select id="queryAll" resultType="com.wheeldestiny.springbootno_1.bean.JobOffersList">
+        select
+            jobOffersId,enterpriseName,recruitmentPositionName,location,industry,numberOfPeople,salary,experience,educationalBackground,skillsName,isdelete
+        from
+            v_jobofferslist
+        where
+            isdelete=0
+            and
+            recruitmentPositionName like concat('%',#{recruitmentPositionName},'%')
+            and
+            enterpriseName like concat('%',#{enterpriseName},'%')
+            and
+            location like concat('%',#{location},'%')
+            and
+            industry like concat('%',#{industry},'%')
+            and
+            salary like concat('%',#{salary},'%')
+            <if test="experience!=-1" >
+            and
+            experience = #{experience}
+            </if>
+            <if test="educationalBackground!=-1" >
+                and
+                educationalBackground = #{educationalBackground}
+            </if>
+    </select>
+
+</mapper>

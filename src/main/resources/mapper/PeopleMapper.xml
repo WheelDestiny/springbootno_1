@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wheeldestiny.springbootno_1.dao.PeopleDao">
+
+    <select id="queryAll" resultType="com.wheeldestiny.springbootno_1.bean.People">
+        select
+            id,name,intelligence,strength,speed,power,isdelete
+        from
+            t_people
+        where
+            isdelete=0
+            and
+            name like concat('%',#{name},'%')
+    </select>
+    <insert id="addPeople" >
+        insert
+        into
+            t_people
+            (name,intelligence,strength,speed,power)
+        VALUE
+            (#{name},#{intelligence},#{strength},#{speed},#{power})
+    </insert>
+    <update id="updatePeople">
+        update
+            t_people
+        set
+            name=#{name},intelligence=#{intelligence},strength=#{strength},speed=#{speed},power=#{power}
+        WHERE id=#{id}
+    </update>
+    <update id="deletePeople">
+        update
+            t_people
+        set
+            isdelete=1
+        WHERE id=#{id}
+    </update>
+
+</mapper>
