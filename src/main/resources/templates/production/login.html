@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="static">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title> 测试项目no.01 </title>
+
+    <!-- Bootstrap -->
+    <link href="vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<!--    &lt;!&ndash; NProgress &ndash;&gt;-->
+    <link href="vendors/nprogress/nprogress.css" rel="stylesheet">
+<!--    &lt;!&ndash; Animate.css &ndash;&gt;-->
+    <link href="vendors/animate.css/animate.min.css" rel="stylesheet">
+
+<!--    &lt;!&ndash; Custom Theme Style &ndash;&gt;-->
+    <link href="build/css/custom.min.css" rel="stylesheet">
+
+  </head>
+  <script th:src="@{/vendors/jquery/dist/jquery.min.js}"></script>
+  <script th:src="@{/vendors/bootstrap/dist/js/bootstrap.min.js}"></script>
+  <script th:src="@{/layer-master/dist/layer.js}"></script>
+
+<!--  <script th:src="@{/layer/layer.js}"></script>-->
+
+<script>
+    // 登录
+    function loginIn () {
+    var username = $("#username").val();
+    var password = $("#password").val();
+    var verificationCode = $("#verificationCode").val();
+    if (username == "") {
+      layer.msg("账号不能为空，请输入", {time: 2000, icon: 5, shift: 6}, function () {
+      });
+      return;
+    }
+    if (password == "") {
+      layer.msg("密码不能为空，请输入", {time: 2000, icon: 5, shift: 6}, function () {
+      });
+      return;
+    }
+    //验证码不能为空
+      if (verificationCode == "") {
+        layer.msg("验证码不能为空，请输入", {time: 2000, icon: 5, shift: 6}, function () {
+        });
+        return;
+      }
+      //校验验证码
+      $.ajax({
+        type:'POST',
+        data:JSON.stringify(verificationCode),
+        url:"/testCode",
+        dataType:'json',
+        contentType : "application/json",
+        success:function(data){
+          if(data){
+            //提交表单
+            var loadingIndex = null;
+            var user = {"username":username,"password":password}
+            $.ajax({
+              type:'POST',
+              data:JSON.stringify(user),
+              url:"/loginIn",
+              dataType:'json',
+              contentType : "application/json",
+              beforeSend: function () {
+                loadingIndex = layer.msg('处理中', {icon: 16});
+              },
+              success:function(data){
+                layer.close(loadingIndex);
+                if(data.result){
+                  window.location.href = "/index";
+                }else{
+                  layer.msg("用户登录账号或密码不正确，请重新输入", {time: 2000, icon: 5, shift: 6}, function () {
+                  });
+                }
+              }
+            })
+          }else{
+            document.getElementById("imgKaptcha").click();
+            layer.msg("验证码不正确，请重新输入", {time: 2000, icon: 5, shift: 6}, function () {
+            });
+            return;
+          }
+        }
+      })
+  }
+    //提交注册表单
+    function addUser(){
+      var newUsername = $("#newUsername").val();
+      var newPassword1 = $("#newPassword1").val();
+      if(newUserNameMark&&newPasswordMark){
+        //表单格式正确
+        //提交表单
+        var loadingIndex = null;
+        var user = {"username":newUsername,"password":newPassword1}
+        $.ajax({
+          type:'POST',
+          data:JSON.stringify(user),
+          url:"/addUser",
+          dataType:'json',
+          contentType : "application/json",
+          beforeSend: function () {
+            loadingIndex = layer.msg('处理中', {icon: 16});
+          },
+          success:function(data){
+            layer.close(loadingIndex);
+            if(data.result){
+              // 注册成功
+              window.location.href = "/index";
+            }else{
+              layer.msg("注册失败，请稍后重试", {time: 2000, icon: 5, shift: 6}, function () {
+              });
+            }
+          }
+        })
+      }else{
+        layer.msg("用户名或密码格式有误，请重新填写", {time: 2000, icon: 5, shift: 6}, function () {
+        });
+      }
+    }
+    //账号合法标记
+    var newUserNameMark = false;
+    //用户名合法标记
+    var newNameMark = false;
+    //密码合法标记
+    var newPasswordMark = false;
+    //密码输入格式验证
+    function testPassword(obj,mark) {
+        //校验密码：只能输入6-20个字母、数字、下划线
+        var patrn=/^(\w){6,20}$/;
+        var newPassword1;
+        var newPassword2;
+        // 开始验证
+        //当第一行密码输入
+        if(mark==1){
+            newPassword1=obj;
+            newPassword2 = document.getElementById("newPassword2").value;
+            if(newPassword1==""){
+                layer.msg("密码不能为空", {time: 2000, icon: 5, shift: 6}, function () {
+                });
+                newPasswordMark=false;
+                return;
+            }else if(!patrn.test(newPassword1)){
+                layer.msg("密码格式有误", {time: 2000, icon: 5, shift: 6}, function () {
+                });
+                newPasswordMark=false;
+                return;
+            }
+        }
+        //第二行密码输入
+        else if(mark==2){
+            newPassword2=obj;
+            newPassword1 = document.getElementById("newPassword1").value;
+            if(newPassword2==""){
+                layer.msg("密码不能为空", {time: 2000, icon: 5, shift: 6}, function () {
+                });
+                newPasswordMark=false;
+                return;
+            }else if(!patrn.test(newPassword2)){
+                layer.msg("密码格式有误", {time: 2000, icon: 5, shift: 6}, function () {
+                });
+                newPasswordMark=false;
+                return;
+            }
+        }
+        if(newPassword1!=newPassword2){
+            layer.msg("两次输入密码不同", {time: 2000, icon: 5, shift: 6}, function () {
+            });
+            newPasswordMark=false;
+        }else{
+            layer.msg("密码可以使用", {time: 2000, icon: 1}, function () {
+            });
+            newPasswordMark=true;
+        }
+    }
+    $(function () {
+      //局部刷新
+      //验证码局部刷新
+
+      //用户名非空且不重复，两个密码相同
+      //给用户名输入框定义一个离焦事件
+      $("#newUsername").blur(function () {
+        //获取文本输入框的值
+        var username=$(this).val();
+        var user = {"username":username};
+          //用户名正则，4到16位（字母，数字，下划线，减号）
+          var uPattern = /^[a-zA-Z0-9_-]{4,16}$/;
+        if (username==""){
+          layer.msg("账号不能为空", {time: 2000, icon: 5, shift: 6}, function () {
+          });
+          newUserNameMark=false;
+        }else if(!uPattern.test(username)){
+            layer.msg("账号格式不正确", {time: 2000, icon: 5, shift: 6}, function () {
+            });
+            newUserNameMark=false;
+        }else{
+          $.ajax({
+            type:'POST',
+            data:JSON.stringify(user),
+            url:"/queryByname",
+            dataType:'json',
+            contentType : "application/json",
+            success:function(data){
+              if(data){
+                layer.msg("账号可以使用", {time: 2000, icon: 1}, function () {
+                });
+                newUserNameMark=true;
+              }else{
+                layer.msg("账号已被使用，请重新输入", {time: 2000, icon: 5, shift: 6}, function () {
+                  document.getElementById("newUsername").value="";
+                  newUserNameMark=false;
+                });
+              }
+            }
+          })
+        }
+      });
+        $("#newPassword1").blur(function(){testPassword($(this).val(),1)});
+        $("#newPassword2").blur(function(){testPassword($(this).val(),2)});
+    });
+</script>
+  <body class="login">
+    <div>
+      <a class="hiddenanchor" id="signup"></a>
+      <a class="hiddenanchor" id="signin"></a>
+
+      <div class="login_wrapper">
+        <div class="animate form login_form">
+          <section class="login_content">
+            <form>
+              <h1>测试项目No.1</h1>
+              <div>
+                <input type="text" class="form-control" placeholder="账号" required="" th:id="username" th:name="username"/>
+              </div>
+              <div>
+                <input type="password" class="form-control" placeholder="密码" required="" th:id="password" th:name="password"/>
+              </div>
+              <div>
+                <input type="text" class="form-control" placeholder="验证码" required="" th:id="verificationCode" th:name="verificationCode"/>
+                <img src="/defaultKaptcha" th:id="imgKaptcha" th:name="imgKaptcha" onclick="this.src='/defaultKaptcha?d='+new Date()*1">
+              </div>
+              <div>
+                <a class="btn btn-default submit" href="javascript:void(0)" th:id="loginButton" th:onclick="'javascript:loginIn()'">Log in</a>
+              </div>
+
+              <div class="clearfix"></div>
+
+              <div class="separator">
+                <p class="change_link">New to site?
+                  <a href="#signup" class="to_register"> Create Account </a>
+                </p>
+
+                <div class="clearfix"></div>
+                <br />
+
+                <div>
+                  <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
+                  <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <div id="register" class="animate form registration_form">
+          <section class="login_content">
+            <form>
+              <h1>创建用户</h1>
+              <div>
+                <input type="text" class="form-control" placeholder="登录账号（4-16位，字母，数字，下划线）" required="" th:id="newUsername" th:name="nweUsername"/>
+              </div>
+              <div>
+                  <input type="text" class="form-control" placeholder="用户名（）" required="" th:id="newUsername" th:name="nweUsername"/>
+              </div>
+              <div>
+                <input type="password" class="form-control" placeholder="密码（6-20位字母、数字、下划线）" required="" th:id="newPassword1" th:name="newPassword1"/>
+              </div>
+              <div>
+                <input type="password" class="form-control" placeholder="再次输入密码（6-20位字母、数字、下划线）" required="" th:id="newPassword2" th:name="newPassword2"/>
+              </div>
+              <div>
+<!--                <a href="javascript:void(0)" th:name="addUser" th:id="addUser" th:onclick="'javascript:addUser()'">Submit</a>-->
+                <a class="btn btn-default submit" href="javascript:void(0)" th:id="addUser" th:onclick="'javascript:addUser()'">Submit</a>
+              </div>
+
+              <div class="clearfix"></div>
+
+              <div class="separator">
+                <p class="change_link">Already a member ?
+                  <a href="#signin" class="to_register"> Log in </a>
+                </p>
+
+                <div class="clearfix"></div>
+                <br />
+
+                <div>
+                  <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
+                  <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

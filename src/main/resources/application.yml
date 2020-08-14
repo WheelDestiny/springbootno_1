@@ -1,0 +1,41 @@
+#spring.application.name=springbootno_1
+#management.endpoints.jmx.exposure.include=*
+#management.endpoints.web.exposure.include=*
+#management.endpoint.health.show-details=always
+# spring cloud access&secret config
+# 可以访问如下地址查看: https://usercenter.console.aliyun.com/#/manage/ak
+#alibaba.cloud.access-key=****
+#alibaba.cloud.secret-key=****
+# 应用服务 WEB 访问端口
+#server.port=8080
+# Actuator Web 访问端口
+#management.server.port=8081
+#mybatis.mapper-locations=classpath:mapper/*Mapper.xml
+#mybatis.type-aliases-package=com.wheeldestiny.springbootno_1.dao
+spring:
+  datasource:
+    name: springmvc-test
+    url: jdbc:mysql://127.0.0.1:3306/springmvc-test?characterEncoding=utf8
+    username: root
+    password: 3gehuoqiangshou
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: springbootno_1
+  thymeleaf:
+    prefix: classpath:/templates
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+    check-template: true
+    check-template-location: true
+    enabled: true
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: mapper/*Mapper.xml
+  type-aliases-package: com.wheeldestiny.springboot_1.dao
+server:
+  port: 8080
